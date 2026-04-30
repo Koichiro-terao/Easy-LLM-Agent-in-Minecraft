@@ -214,7 +214,7 @@ Default として、Minecraft サーバ起動時に `ws://host.docker.internal:7
   python main.py --config sally_cfg.yml
   ```
 
-ターミナルC上に、`ction generation will start when you press Enter.`と表示されれば起動完了です。
+ターミナルC上に、`Action generation will start when you press Enter.`と表示されれば起動完了です。
 
 以降は任意のタイミングで、ターミナルCに対して Enter key を一度入力すると、エージェントが行動を生成します。
 
