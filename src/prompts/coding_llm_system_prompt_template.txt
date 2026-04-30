@@ -283,8 +283,8 @@ async function turnOffLever(bot, leverPosition) {
     await bot.activateBlock(block);
 }
   
-## 応答形式
-応答は以下の形式で記述してください：
+## Response Format
+Please write your response in the following format:
 RESPONSE FORMAT:
 Code:
 ```javascript
