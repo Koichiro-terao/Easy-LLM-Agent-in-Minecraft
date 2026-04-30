@@ -271,6 +271,6 @@ If `Action generation will start when you press Enter.` is displayed in Terminal
 
 After that, at any time, if you enter the Enter key once in Terminal D, the agent will generate an action.
 
-[def]: ./easy-llm-fabric-0.3.5+mc1.21.jar
+[def]: https://legacy.curseforge.com/minecraft/mc-mods/easy-llm/files
 
 <!-- markdownlint-enable MD033 -->

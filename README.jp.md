@@ -276,6 +276,6 @@ anne_cfg.yml を使用する場合は、ターミナルDにおいて、本リポ
 
 以降は任意のタイミングで、ターミナルDに対して Enter key を一度入力すると、エージェントが行動を生成します。
 
-[def]: ./easy-llm-fabric-0.3.5+mc1.21.jar
+[def]: https://legacy.curseforge.com/minecraft/mc-mods/easy-llm/files
 
 <!-- markdownlint-enable MD033 -->
