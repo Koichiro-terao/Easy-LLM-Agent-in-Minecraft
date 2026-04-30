@@ -1,0 +1,15 @@
+.gradle/
+build/
+run/
+*.log
+*.tmp
+*.bak
+
+Easy_LLM/logs/
+asy_LLM/__pycache__/
+asy_LLM/.vscode/
+
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
