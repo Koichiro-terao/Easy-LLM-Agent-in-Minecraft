@@ -210,6 +210,13 @@ In Terminal C, execute the following from the root folder of this repository to 
 
 If `Action generation will start when you press Enter.` is displayed in Terminal C, startup is complete.
 
+When `sally` joins the Minecraft world, run the following command in Terminal A (the Minecraft server).
+<br>The AI agent needs operator permissions in order to use chests and other items.
+
+```
+op sally
+```
+
 After that, at any time, if you enter the Enter key once in Terminal C, the agent will generate an action.
 
 ## 6. How to Add a Second and Subsequent Agents
@@ -268,6 +275,15 @@ If you are using anne_cfg.yml, run the following commands from the root folder o
   ```
 
 If `Action generation will start when you press Enter.` is displayed in Terminal D, startup is complete.
+
+When the AI agent joins the Minecraft world, run the following command in Terminal A (the Minecraft server).
+<br>The AI agent needs operator permissions in order to use chests and other items.
+
+```
+op xxx
+```
+
+Replace xxx with the L2 agent_name value, "any name", that you configured in 6.1 Creating agent_cfg.yml
 
 After that, at any time, if you enter the Enter key once in Terminal D, the agent will generate an action.
 

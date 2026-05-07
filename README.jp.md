@@ -216,6 +216,13 @@ Default として、Minecraft サーバ起動時に `ws://host.docker.internal:7
 
 ターミナルC上に、`Action generation will start when you press Enter.`と表示されれば起動完了です。
 
+sally が Minecraft ワールドに参加したら、ターミナルA (Minecraftサーバー用) で以下を実行してください。
+<br>AI エージェントがチェスト等を使用するために、 op 権限を付与する必要があります。
+
+```
+op sally
+```
+
 以降は任意のタイミングで、ターミナルCに対して Enter key を一度入力すると、エージェントが行動を生成します。
 
 ## 6. 二人目以降のエージェントの追加方法
@@ -273,6 +280,15 @@ anne_cfg.yml を使用する場合は、ターミナルDにおいて、本リポ
   ```
 
 ターミナルD上に、`Action generation will start when you press Enter.`と表示されれば起動完了です。
+
+AI エージェントが Minecraft ワールドに参加したら、ターミナルA (Minecraftサーバー用) で以下を実行してください。
+<br>AI エージェントがチェスト等を使用するために、 op 権限を付与する必要があります。
+
+```
+op xxx
+```
+
+ただし`xxx`は、[6.1 agent_cfg.yml の作成](#61-agent_cfgyml-の作成)で設定した L2 agent_name: "任意の名前" を記述して下さい。
 
 以降は任意のタイミングで、ターミナルDに対して Enter key を一度入力すると、エージェントが行動を生成します。
 

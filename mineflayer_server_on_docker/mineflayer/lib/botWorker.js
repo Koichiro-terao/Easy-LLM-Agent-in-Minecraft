@@ -137,7 +137,7 @@ bot.once('spawn', async () => {
     bot.loadPlugin(pathfinder);
 
     bot.on('error', (err) => logger.error(`Error in worker of ${mcName}: ${err.stack}`));
-    bot.on('kicked', (msg) => logger.error(`${mcName} kicked: ${msg}`));
+    bot.on('kicked', (reason) => logger.error(`${mcName} kicked: ${JSON.stringify(reason, null, 2)}`));
     bot.on('end', () => logger.info(`${mcName} disconnected.`));
     bot.on('message', (jsonMsg) => {
         const message = jsonMsg.toString();
@@ -185,6 +185,8 @@ bot.once('spawn', async () => {
         }
     }
     bot.on("physicsTick", onTick);
+
+    bot.offsetVec3 = new Vec3(0,0,0);
 });
 
 async function execute({code, primitives=[]}){
@@ -224,7 +226,7 @@ async function execute({code, primitives=[]}){
     bot.pathfinder.setMovements(movements);
 
     const primitivesStr = primitives.join("\n\n");
-    const wholeCode = "(async () => {" + primitivesStr + "\n" + code + "})()";
+    const wholeCode = "(async () => {" + primitivesStr + "\n" + code + "\n})()";
     let success;
     let errorMsg = null;
     try{

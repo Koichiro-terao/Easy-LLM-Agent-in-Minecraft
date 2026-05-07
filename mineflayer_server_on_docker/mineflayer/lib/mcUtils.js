@@ -464,7 +464,7 @@ async function getPlayer({bot, mcName, searchPos=null, maxRetries=30}){
 function enableTransparency({bot, agentName=null}){
     let mcName;
     if(agentName){
-        mcName = bot.agentInfo[agentName].mcName;
+        mcName = bot.agentInfo ? bot.agentInfo[agentName].mcName : agentName;
     } else {
         mcName = "@s";
     }
@@ -474,7 +474,7 @@ function enableTransparency({bot, agentName=null}){
 function disableTransparency({bot, agentName=null}){
     let mcName;
     if(agentName){
-        mcName = bot.agentInfo[agentName].mcName;
+        mcName = bot.agentInfo ? bot.agentInfo[agentName].mcName : agentName;
     } else {
         mcName = "@s";
     }

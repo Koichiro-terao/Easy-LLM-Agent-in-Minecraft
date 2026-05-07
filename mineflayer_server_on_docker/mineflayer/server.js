@@ -19,6 +19,26 @@ const conf = {};
 const workers = {};
 let closingPromise = null;
 
+function getWorkerKey(serverId, mcName) {
+    return `${serverId}\n${mcName}`;
+}
+
+function parseWorkerKey(workerKey) {
+    const [serverId, mcName] = workerKey.split("\n");
+    return { serverId, mcName };
+}
+
+function hasActiveWorkers() {
+    return Object.keys(workers).length > 0;
+}
+
+function resetServerState(resetMessage="Server closed and reset") {
+    isSetupCompleted = false;
+    logger = null;
+    for (const k in conf) delete conf[k];
+    console.log(resetMessage);
+}
+
 function resolveMcHost(host) {
     const alias = process.env.BN_DOCKER_LOCALHOST_ALIAS;
     if (alias && (host === "localhost" || host === "127.0.0.1")) {
@@ -71,6 +91,25 @@ async function postMessageToWorker(serverId, mcName, command, args={}, transferL
         throw new Error(result.errorMsg);
     }
     return result.data;
+}
+
+async function terminateWorker(serverId, mcName) {
+    if(!(serverId in workers)){
+        throw new Error(`serverId "${serverId}" does not exist. List of serverId...${Object.keys(workers)}`);
+    }
+    if(!(mcName in workers[serverId])){
+        throw new Error(`mcName "${mcName}" does not exist. List of mcName...${Object.keys(workers[serverId])}`);
+    }
+
+    const worker = workers[serverId][mcName];
+    if (worker) {
+        await worker.terminate();
+    }
+
+    delete workers[serverId][mcName];
+    if (Object.keys(workers[serverId]).length === 0) {
+        delete workers[serverId];
+    }
 }
 
 async function setup({ 
@@ -158,10 +197,19 @@ async function join({
         await worker.terminate();
 
     }
+
+    return { serverId, mcName };
 }
 
 async function leave({serverId, mcName}){
-    await postMessageToWorker(serverId, mcName, "close");
+    try {
+        await postMessageToWorker(serverId, mcName, "close");
+    } finally {
+        await terminateWorker(serverId, mcName);
+        if (!hasActiveWorkers()) {
+            resetServerState("All bots left. Server reset to idle state.");
+        }
+    }
 }
     
 async function execJs({serverId, mcName, code, primitives}){
@@ -227,14 +275,7 @@ async function close({}) {
         }
 
         for (const k in workers) delete workers[k];
-
-        isSetupCompleted = false;
-
-        logger = null;
-
-        for (const k in conf) delete conf[k];
-
-        console.log("Server closed and reset");
+        resetServerState("Server closed and reset");
     })();
 
     try {
@@ -249,6 +290,7 @@ wss.on('connection', (ws) => {
   let pingCheckId = null;
   let missedPongs = 0;
   let closedHandled = false;
+  const ownedWorkers = new Set();
 
   ws.isAlive = true;
   ws.on('pong', () => {
@@ -264,7 +306,20 @@ wss.on('connection', (ws) => {
       pingCheckId = null;
     }
     try {
-      await close({});
+      for (const workerKey of [...ownedWorkers]) {
+        const { serverId, mcName } = parseWorkerKey(workerKey);
+        try {
+          await leave({ serverId, mcName });
+        } catch (e) {
+          if (logger) {
+            logger.warn(`Failed to clean up worker ${serverId}/${mcName} on websocket close: ${e.message}`);
+          } else {
+            console.warn(`Failed to clean up worker ${serverId}/${mcName} on websocket close: ${e.message}`);
+          }
+        } finally {
+          ownedWorkers.delete(workerKey);
+        }
+      }
     } catch (e) {
       if (logger) {
         logger.warn(`Cleanup on websocket close failed: ${e.message}`);
@@ -305,8 +360,14 @@ wss.on('connection', (ws) => {
             case "stopMoving": await stopMoving(params); break;
             case "execMc": await execMc(params); break;
 
-            case "join": await join(params); break;
-            case "leave": await leave(params); break;
+            case "join":
+                response = await join(params);
+                ownedWorkers.add(getWorkerKey(params.serverId, params.mcName));
+                break;
+            case "leave":
+                await leave(params);
+                ownedWorkers.delete(getWorkerKey(params.serverId, params.mcName));
+                break;
 
             case "updateAgentVariables": await updateAgentVariables(params); break;
 
@@ -335,7 +396,7 @@ wss.on('connection', (ws) => {
         }
         const msg = {type: "response", messageId, data: {errorMsg}};
         ws.send(JSON.stringify(msg));
-        await onSocketClosed();
+        await close({});
     }
   });
 
