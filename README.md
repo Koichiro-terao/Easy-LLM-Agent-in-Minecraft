@@ -287,6 +287,12 @@ Replace xxx with the L2 agent_name value, "any name", that you configured in 6.1
 
 After that, at any time, if you enter the Enter key once in Terminal D, the agent will generate an action.
 
+## LICENSE
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+Some portions of the code are adapted from [MineDojo/Voyager](https://github.com/MineDojo/Voyager), which is also licensed under the MIT License.
+
 [def]: https://legacy.curseforge.com/minecraft/mc-mods/easy-llm/files
 
 <!-- markdownlint-enable MD033 -->

@@ -292,6 +292,12 @@ op xxx
 
 以降は任意のタイミングで、ターミナルDに対して Enter key を一度入力すると、エージェントが行動を生成します。
 
+## LICENSE
+
+本プロジェクトは MIT ライセンスの下で提供されています。詳細については、[LICENSE](./LICENSE) をご参照ください。
+
+コードの一部は、同じく MIT ライセンスの下で提供されている [MineDojo/Voyager](https://github.com/MineDojo/Voyager) を改変して使用しています。
+
 [def]: https://legacy.curseforge.com/minecraft/mc-mods/easy-llm/files
 
 <!-- markdownlint-enable MD033 -->
