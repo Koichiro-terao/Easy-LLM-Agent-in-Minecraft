@@ -69,7 +69,6 @@ class LLMConfig:
 def build_mineflayer_variables(agent_name, offset, env_box):
     return {
         "offsetVec3": json.dumps({"__Vec3__": offset}),
-        "agentInfo": json.dumps({agent_name:{"mcName":agent_name}}),
         "envBox": json.dumps([
                 {"__Vec3__": env_box[0]},
                 {"__Vec3__": env_box[1]}])
