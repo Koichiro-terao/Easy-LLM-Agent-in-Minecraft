@@ -188,7 +188,7 @@ To delete a destination address currently configured in Minecraft, execute the f
 
 ### 4.2 Setup on Python
 item at src/sally_cfg.yml L11 match the [destination address configured in 4.1 Setup on Minecraft] (if you are running the Minecraft server on Docker, set Minecraft to `ws://host.docker.internal:****` and set src/sally_cfg.yml to L12 `host: 0.0.0.0`, L13 `port: ****`. * can be any value)
-- Confirm that a valid API key is entered in L35 `api_key`
+- Confirm that a valid API key is entered in L34 `api_key`
 
 If you want to have conversations in Japanese, make the following changes.
 
@@ -233,8 +233,7 @@ By creating a new agent_cfg.yml and running the main program, you can create add
 
 - L2 agent_name: "Any name"
 - L13 port: "Any four-digit number"
-- L22 setup: false
-- L35 api_key: Valid API key
+- L34 api_key: Valid API key
 
 note:
 
@@ -243,7 +242,7 @@ note:
 
 If you are using anne_cfg.yml, change the following items in anne_cfg.yml.
 
-- L35 api_key: Valid API key
+- L34 api_key: Valid API key
 
 ### 6.2 Setup on Minecraft
 

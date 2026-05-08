@@ -194,7 +194,7 @@ Default として、Minecraft サーバ起動時に `ws://host.docker.internal:7
 その後、`src/sally_cfg.yml` ファイルにおいて、以下の項目をチェックしてください。
 
 - src/sally_cfg.yml L11 `easy_llm` の項目にある `host: port:` の二つの値と [4.1 Minecraft 上のセットアップ で設定した接続先アドレス] のが一致しているか（Docker 上でMinecraft サーバを立てている場合は、Minecraftでは `ws://host.docker.internal:****`, src/sally_cfg.yml では L12 `host: 0.0.0.0`, L13 `port: ****` と設定してください。* は任意）
-- L35 `api_key` に有効な API キーが入っていることを確認する
+- L34 `api_key` に有効な API キーが入っていることを確認する
 
 日本語での会話を行いたい場合は、以下の変更を行ってください。
 
@@ -239,7 +239,7 @@ op sally
 
 - L2 agent_name: "任意の名前"
 - L13 port: "４桁の任意の数字"
-- L35 api_key: 有効な API キー
+- L34 api_key: 有効な API キー
 
 ** 注意 **
 
@@ -248,7 +248,7 @@ op sally
 
 anne_cfg.yml を使用する場合は、以下の項目を変更してください。
 
-- L35 api_key: 有効な API キー
+- L34 api_key: 有効な API キー
 
 ### 6.2 Minecraft 上のセットアップ
 
