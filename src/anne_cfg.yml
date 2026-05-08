@@ -19,7 +19,6 @@ minecraft_server:
 
 mineflayer_server:
   port: 3000
-  setup: false
 
 minecraft:
   offset: [0, 0, 0]

@@ -44,7 +44,6 @@ class MinecraftServerConfig:
 @dataclass(frozen=True)
 class MineflayerServerConfig:
     port: int
-    setup: bool
 
 @dataclass(frozen=True)
 class MinecraftConfig:
@@ -93,7 +92,6 @@ def build_agent_dataclasses(config):
     )
     mineflayer_server = MineflayerServerConfig(
         port=config["mineflayer_server"]["port"],
-        setup=config["mineflayer_server"]["setup"],
     )
     minecraft = MinecraftConfig(
         offset=config["minecraft"]["offset"],
@@ -159,16 +157,14 @@ class Agent:
 
     ########################### action methods from mod ############################
     def add_avatar(self):
-        self.agent_logger.info(f"mf_server_setup:{self.mineflayer_server_cfg.setup}")
         self.js_client.connect()
-        if self.mineflayer_server_cfg.setup:
-            self.js_client.setup(
-                can_dig_when_move=self.minecraft_cfg.can_dig_when_move,
-                move_timeout_sec=self.minecraft_cfg.move_timeout_sec,
-                stuck_check_interval_sec=self.minecraft_cfg.stuck_check_interval_sec,
-                stuck_offset_range=self.minecraft_cfg.stuck_offset_range,
-                sync=True,
-            )
+        self.js_client.setup(
+            can_dig_when_move=self.minecraft_cfg.can_dig_when_move,
+            move_timeout_sec=self.minecraft_cfg.move_timeout_sec,
+            stuck_check_interval_sec=self.minecraft_cfg.stuck_check_interval_sec,
+            stuck_offset_range=self.minecraft_cfg.stuck_offset_range,
+            sync=True,
+        )
         self.js_client.join(server_id=self.minecraft_server_cfg.server_id, mc_name=self.agent_name, mc_port=self.minecraft_server_cfg.port, mc_host=self.minecraft_server_cfg.host)
         self.js_client.update_agent_variables(server_id=self.minecraft_server_cfg.server_id, mc_name=self.agent_name, variables=self.mineflayer_variables)
     

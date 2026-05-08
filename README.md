@@ -136,7 +136,7 @@ Start each server in a separate terminal. Open two terminals from the root folde
   ```
   Here, `xxx` is your Minecraft user name. This grants op permissions to your user, allowing you to use various commands. When using the same server again, you do not need to execute the above command.
 
-** Note **
+Note:
 <br>If you have previously opened a server on Docker with the same port number, confirm that the docker container is stopped, and then perform [3.1 Starting and Preparing the Minecraft Server](#31-starting-and-preparing-the-minecraft-server).
 
 ### 3.2 Starting the Mineflayer Server
@@ -237,8 +237,9 @@ By creating a new agent_cfg.yml and running the main program, you can create add
 - L35 api_key: Valid API key
 
 note:
-<br>make sure agent_name is a name that does not exist as an in-game player. Due to Minecraft specifications, players with the same name cannot exist.
-<br>Also, set the port number to a number that is different from the other AI agents.
+
+- make sure agent_name is a name that does not exist as an in-game player. Due to Minecraft specifications, players with the same name cannot exist.
+- Also, set the port number to a number that is different from the other AI agents.
 
 If you are using anne_cfg.yml, change the following items in anne_cfg.yml.
 
