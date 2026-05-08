@@ -12,7 +12,7 @@ async function giveItemToOther(bot, othername, item, num) {
     }
 
     const otherAgentName = othername;
-    const otherMcName = bot.agentInfo[otherAgentName].mcName;
+    const otherMcName = bot.agentInfo ? bot.agentInfo[otherAgentName].mcName : otherAgentName;
 
     if (!bot.players[otherMcName]?.entity){
         await think(bot, `player ${otherAgentName} not found.`);
