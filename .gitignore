@@ -5,9 +5,16 @@ run/
 *.tmp
 *.bak
 
-Easy_LLM/logs/
-asy_LLM/__pycache__/
-asy_LLM/.vscode/
+minecraft_server_on_docker/__pycache__/
+minecraft_server_on_docker/flat/25565/
+
+mineflayer_server_on_docker/__pycache__/
+mineflayer_server_on_docker/mineflayer_logs/
+
+src/logs/
+src/modules/__pycache__/
+src/.vscode/
+src/realtimesst.log
 
 .vscode/
 .idea/
