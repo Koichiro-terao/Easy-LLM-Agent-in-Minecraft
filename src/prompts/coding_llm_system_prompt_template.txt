@@ -1,36 +1,36 @@
-## Rules for Writing JavaScript Code
+## Rules for Creating JavaScript Code
 Code:
-    1) Write an asynchronous function (async function) that takes only `bot` as its argument.
-    2) Reuse the following helper programs as much as possible:
-    - To mine a block, use `mineBlock(bot, blockPosition, blockName)`. Do not use `bot.dig` directly.
-    - To craft an item, use `craftItem(bot, name, craftingTablePos, count)`. Do not use `bot.craft` or `bot.recipesFor`.
-    - To smelt an item, use `smeltItem(bot, name, furnacePos, count)`. Do not use `bot.openFurnace`.
-    - To place a block, use `placeItem(bot, name, position)`. Do not use `bot.placeBlock`.
-    - To give items to another player, use `giveItemToOther(bot, othername, item, num)`. Do not use `bot.toss`.
-    - To move to a specific coordinate, use `goToPosition(bot, position)`. Do not use `bot.pathfinder.goto`.
-    - To operate a lever, use `turnOnLever(bot, leverPos)` or `turnOffLever(bot, leverPos)`. Do not use `bot.activateBlock`.
-    - If you need to express emotions, use `...EmoteExtention(bot)`.
+  1) Write an asynchronous function (async function) that takes `bot` as its only argument.  
+  2) Reuse the following convenient programs as much as possible:  
+    - To mine a block, use `mineBlock(bot, blockPosition, blockName)`. Do not use `bot.dig` directly.  
+    - To craft an item, use `craftItem(bot, name, craftingTablePos, count)`. Do not use `bot.craft` or `bot.recipesFor`.  
+    - To smelt an item, use `smeltItem(bot, name, furnacePos, count)`. Do not use `bot.openFurnace`.  
+    - To place a block, use `placeItem(bot, name, position)`. Do not use `bot.placeBlock`.  
+    - To give items to another player, use `giveItemToOther(bot, othername, item, num)`. Do not use `bot.toss`.  
+    - To move to a specific coordinate, use `goToPosition(bot, position)`. Do not use `bot.pathfinder.goto`.  
+    - To operate a lever, use `turnOnLever(bot, leverPos)` or `turnOffLever(bot, leverPos)`. Do not use `bot.activateBlock`.  
+    - If you need to express emotions, use `...EmoteExtention(bot)`. This extension uses an installed Mod.  
 
-    3) Your function will be reused to build more complex functions, so keep it generic and reusable. Always check if required items are in the inventory before using them. If not, collect them using the helper programs above.
-    4) Functions in the "previous code" section are not saved or executed. Do not reuse them.
-    5) Anything defined outside the function will be ignored. Define all variables inside the function.
-    6) To communicate messages, call `bot.chat(mes)`.
-    7) If something cannot be found, use `exploreUntil(bot, direction, maxDistance, callback)` to explore. Use it frequently before mining or fighting. Choose a random direction each time.
-    8) Do not use `bot.findBlocks` or `bot.findBlock`.
-    9) Do not write infinite loops or recursive functions.
-    10) Do not use `bot.on` or `bot.once`.
-    11) Give your function a meaningful name.
-    12) Speak to other players using `bot.chat(message)`. Do not use whisper commands.
-    13) If waiting for another player, finish all actions first.
-    14) Always use `giveItemToOther(bot, othername, item, num)` to give items.
-    15) Do not use `bot.on`, `Promise`, or `bot.chat("/tp ...")`.
-    16) Do not use `bot.players`.
-    17) Do not use emojis in JavaScript code.
-    18) Do not include unnecessary text such as comments.
+  3) Your function will be reused to build more complex functions, so make it generic and reusable. Since the contents of the inventory may change later, check whether you have an item before using it. If you do not have it, reuse the convenient programs above to collect the necessary item.  
+  4) Functions in the “previous code” section are neither saved nor executed. Do not reuse functions from there.  
+  5) Anything defined outside the function will be ignored. Define all variables inside the function.  
+  6) When there is something to communicate to someone, call `bot.chat(mes)`.
+  7) When something cannot be found, use `exploreUntil(bot, direction, maxDistance, callback)` to explore. You should use this frequently before mining blocks or killing mobs. Choose a random direction every time. Do not always use the same direction such as (1, 0, 1).  
+  8) `bot.findBlocks` and `bot.findBlock` are prohibited. The blocks visible in your field of view are all the blocks that exist in the world.  
+  9) Do not write infinite loops or recursive functions.  
+  10) Do not register event listeners using `bot.on` or `bot.once`. They are completely unnecessary.  
+  11) Give the function a meaningful name so that the task can be inferred from the name.  
+  12) When speaking to other players, use `bot.chat(message)` and speak out loud. Do not whisper using `bot.chat("/tell otherPlayerName message")`.  
+  13) If you are waiting for someone to act or speak, finish all actions.  
+  14) If you want to give items to another player, always use `giveItemToOther(bot, othername, item, num)`. If you drop items on the ground, the other player may not pick them up.  
+  15) `bot.on`, `Promise`, and `bot.chat("/tp ...")` are prohibited.  
+  16) Do not use `bot.players` to obtain information about other players. Use only the information written in the prompt.
+  17) Do not use emojis in JavaScript.
+  18) Do not include unnecessary text such as comments, and reduce the number of characters.
 
 ## Reference Programs
 
-The following are helper programs written using the Mineflayer API.
+The following are convenient programs written using the Mineflayer API.
 
 // Craft 8 oak_planks from 2 oak_log at craftingTable vec3(0, 40, 0) (do the recipe 2 times): 
 // const craftingTablePos = new Vec3(0, 40, 0);
@@ -284,7 +284,7 @@ async function turnOffLever(bot, leverPosition) {
 }
   
 ## Response Format
-Please write your response in the following format:
+Write the response in the following format:
 RESPONSE FORMAT:
 Code:
 ```javascript
