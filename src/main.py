@@ -5,14 +5,15 @@ import time
 import queue
 import threading
 import numpy as np
+import sys
 from datetime import datetime
 from dataclasses import dataclass
 from websockets.sync.server import serve
 
 from modules.js_client import MineflayerJsClient
-from modules.websocketconnecter import WebsocketConnecter
+from modules.websocketconnector import WebsocketConnector
 from modules.belief import StandaloneWorldObservationRuntime, build_world_config_from_first_blocks_data
-from modules.llm import Opneai_LLM, Ollama_LLM
+from modules.llm import OpenAILLM, OllamaLLM
 from modules.utils import make_file_logger, load_config, load_primitives, read_files
 
 __VERSION__ = "20260427_0658"
@@ -136,13 +137,13 @@ class Agent:
         self.belief = None
         self.world_config = None
 
-        self.llm = Opneai_LLM(self.log_dir, self.llm_cfg.api_key, self.llm_cfg.model_name, self.llm_cfg.temperature, self.llm_cfg.request_timeout, self.llm_cfg.max_trial)
+        self.llm = OpenAILLM(self.log_dir, self.llm_cfg.api_key, self.llm_cfg.model_name, self.llm_cfg.temperature, self.llm_cfg.request_timeout, self.llm_cfg.max_trial)
 
         self.MineflayerJsClient_logger = make_file_logger("MineflayerJsClient", f"{self.log_dir}/MineflayerJsClient.log")
         self.js_client = MineflayerJsClient(port=self.mineflayer_server_cfg.port, logger=self.MineflayerJsClient_logger)
         self.mineflayer_variables = build_mineflayer_variables(self.agent_name, self.minecraft_cfg.offset, self.minecraft_cfg.env_box)
 
-        self.easy_llm_ws = WebsocketConnecter("easy_llm", self.easy_llm_cfg.host, self.easy_llm_cfg.port, True)
+        self.easy_llm_ws = WebsocketConnector("easy_llm", self.easy_llm_cfg.host, self.easy_llm_cfg.port, True)
         self.easy_llm_variables = build_easy_llm_variables(self.minecraft_cfg.env_box)
 
     ########################### action methods from mod ############################
@@ -159,7 +160,7 @@ class Agent:
         self.js_client.update_agent_variables(server_id=self.minecraft_server_cfg.server_id, mc_name=self.agent_name, variables=self.mineflayer_variables)
     
     def exec_js(self, js):
-        self.js_client.exec_js(server_id=self.minecraft_server_cfg.server_id, mc_name=self.agent_name, code=js, primitives=self.primitives, sync=True, timeout=180)
+        self.js_client.exec_js(server_id=self.minecraft_server_cfg.server_id, mc_name=self.agent_name, code=js, primitives=self.primitives, sync=False, timeout=180)
     ##################################################################################
 
     #################################### LLM ######################################
@@ -171,10 +172,9 @@ class Agent:
             loader = self.belief.create_current_observation_loader()
             human_prompt = self.belief.load_from_template(loader, human_base_prompt, variables=human_variables, extra_filters=[], allow_filter_override=True)
         except Exception as e:
-            self.agent_logger.critical(f"agent.py L171 エラー発生:{e}")
-            error_msg = traceback.format_exc()
-            self.agent_logger.critical("例外が発生しました:")
-            self.agent_logger.critical(error_msg)
+            self.agent_logger.critical("create_prompt: テンプレート展開エラー: %s", e)
+            self.agent_logger.critical(traceback.format_exc())
+            sys.exit(1) 
         #----------------------------------------------------#
         self.agent_logger.info(f"----------------------------------------------")
         self.agent_logger.info(f"human_prompt:{human_prompt}")
@@ -204,11 +204,11 @@ class Agent:
             except queue.Empty:
                 continue
             if any(item.get("type") == "block_snapshot" for item in obs.get("items", [])):
-                self.world_config = build_world_config_from_first_blocks_data(obs, player_names=["sally", "obs7"])
+                self.world_config = build_world_config_from_first_blocks_data(obs)
                 self.belief = StandaloneWorldObservationRuntime.from_world_config(self.world_config, offset=[0,0,0])
                 continue
-            if self.belief != None:
-                self.belief.add_raw_observation(obs)
+            if self.belief is not None:
+                result = self.belief.add_raw_observation(obs)
     ###########################################################################################
 
     ################################# OBS from mod ####################################

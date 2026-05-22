@@ -87,7 +87,7 @@ def _process_ai_message(message, disallowed_expressions=[]):
 
     return {"failed_code": code}, f"Error parsing action response (before program execution): {error}"
 
-class Opneai_LLM:
+class OpenAILLM:
     def __init__(self, 
                  log_dir:str, 
                  api_key:str, 
@@ -110,19 +110,13 @@ class Opneai_LLM:
         pass
 
     def format_prompts_for_llm(self, prompts: list[tuple[str, str]]) -> list[dict]:
-        formated_prompts = []
-        add = formated_prompts.append
-        for (type, content) in prompts:
-            if type == "user":
-                add({"role":"user", "content":content})
-            elif type == "system":
-                add({"role":"system", "content":content})
-            elif type == "assistant":
-                add({"role":"assistant", "content":content})
+        formatted = []
+        for role, content in prompts:
+            if role in ("user", "system", "assistant"):
+                formatted.append({"role": role, "content": content})
             else:
-                assert f"対応したメッセージ形式がありません。"
-        
-        return formated_prompts
+                raise ValueError(f"対応したメッセージ形式がありません: {role}")
+        return formatted
 
     def request_llm(self, prompts:list, disallowed_expressions=[], javascript_check=True):
         client, model_name, temperature, request_timeout = self.client, self.model_name, self.temperature, self.request_timeout
@@ -143,20 +137,17 @@ class Opneai_LLM:
                 parsed_result, error = _process_ai_message(response.choices[0].message.content, disallowed_expressions=disallowed_expressions)
             else:
                 parsed_result, error = {"whole_code":response.choices[0].message.content}, None
-            # parsed_result, error = message.content, None # デバッグ用
             
             timestr = datetime.now().strftime(TIMESTR_FORMAT)
+            log_prompt = f""
+            for prompt in prompts:
+                log_prompt += f"{prompt['content']}"
+
             if error is None:
-
-                log_prompt = f""
-                for prompt in prompts:
-                    log_prompt += f"{prompt['content']}"
-
                 with (Path(log_dir) / f"coding_llm_{timestr}_human_prompt.txt").open("w", encoding='utf-8') as f:
                     f.write(log_prompt)
 
                 code = parsed_result["whole_code"]
-                # code = parsed_result # デバッグ用
                 with (Path(log_dir) / f"coding_llm_{timestr}_code.txt").open("w", encoding='utf-8') as f:
                     f.write(code)
 
@@ -165,14 +156,19 @@ class Opneai_LLM:
                 print(f"\033[31m----------------------------\033[0m")
                 print(f"\033[31m{code}\033[0m")
                 return code, timestr
-            
-            with (Path(log_dir) / f"coding_llm_{timestr}_failed_code.txt").open("w", encoding='utf-8') as f:
-                f.write(parsed_result["failed_code"])
-            logger.info(f"Failed coding. Message: {error}")
+
+            else:
+                with (Path(log_dir) / f"coding_llm_{timestr}_failed_human_prompt.txt").open("w", encoding='utf-8') as f:
+                    f.write(log_prompt)
+                with (Path(log_dir) / f"coding_llm_{timestr}_failed_code.txt").open("w", encoding='utf-8') as f:
+                    f.write(parsed_result["failed_code"])
+                logger.info(f"Failed coding. Message: {error}")
+                continue
+
         print(f"Failed coding in {max_trial} trials.")
         return "await doNothing(bot);", None
 
-class Langchain_LLM:
+class LangchainLLM:
     def __init__(self, 
                  log_dir:str, 
                  api_key:str, 
@@ -201,20 +197,18 @@ class Langchain_LLM:
 
         pass
 
-    def format_prompts_for_llm(self, prompts: list[tuple[str, str]]) -> list[dict]:
-        formated_prompts = []
-        add = formated_prompts.append
-        for (type, content) in prompts:
-            if type == "user":
-                add(HumanMessage(content=content))
-            elif type == "system":
-                add(SystemMessage(content=content))
-            elif type == "assistant":
-                add(AIMessage(content=content))
+    def format_prompts_for_llm(self, prompts: list[tuple[str, str]]) -> list:
+        formatted = []
+        for role, content in prompts:
+            if role == "user":
+                formatted.append(HumanMessage(content=content))
+            elif role == "system":
+                formatted.append(SystemMessage(content=content))
+            elif role == "assistant":
+                formatted.append(AIMessage(content=content))
             else:
-                assert f"対応したメッセージ形式がありません。"
-        
-        return formated_prompts
+                raise ValueError(f"対応したメッセージ形式がありません: {role}")
+        return formatted
    
     def request_llm(self, prompts:list, disallowed_expressions=[], javascript_check=True):
         model = self.model
@@ -232,11 +226,10 @@ class Langchain_LLM:
             # parsed_result, error = message.content, None # デバッグ用
             
             timestr = datetime.now().strftime(TIMESTR_FORMAT)
+            log_prompt = f""
+            for prompt in prompts:
+                log_prompt += f"{prompt.content}"
             if error is None:
-
-                log_prompt = f""
-                for prompt in prompts:
-                    log_prompt += f"{prompt.content}"
 
                 with (Path(log_dir) / f"coding_llm_{timestr}_human_prompt.txt").open("w", encoding='utf-8') as f:
                     f.write(log_prompt)
@@ -252,14 +245,18 @@ class Langchain_LLM:
                 print(f"\033[31m{code}\033[0m")
                 return code, timestr
             
-            with (Path(log_dir) / f"coding_llm_{timestr}_failed_code.txt").open("w", encoding='utf-8') as f:
-                f.write(parsed_result["failed_code"])
+            else:
+                with (Path(log_dir) / f"coding_llm_{timestr}_failed_human_prompt.txt").open("w", encoding='utf-8') as f:
+                    f.write(log_prompt)
+                with (Path(log_dir) / f"coding_llm_{timestr}_failed_code.txt").open("w", encoding='utf-8') as f:
+                    f.write(parsed_result["failed_code"])
+                logger.info(f"Failed coding. Message: {error}")
+                continue
             
-            logger.info(f"Failed coding. Message: {error}")
         print(f"Failed coding in {max_trial} trials.")
         return "await doNothing(bot);", None
 
-class Ollama_LLM:
+class OllamaLLM:
     def __init__(self,
                  log_dir:str, 
                  model_name:str="gpt-oss:20b", 
@@ -274,8 +271,8 @@ class Ollama_LLM:
         self.temperature =temprature
         self.request_timeout = request_timeout
         self.max_trial = max_trial
-        self.address=address,
-        self.port=port,
+        self.address=address
+        self.port=port
         self.url = f"http://{address}:{port}/api/chat" 
         # model起動
         payload = {
@@ -289,19 +286,13 @@ class Ollama_LLM:
         pass
 
     def format_prompts_for_llm(self, prompts: list[tuple[str, str]]) -> list[dict]:
-        formated_prompts = []
-        add = formated_prompts.append
-        for (type, content) in prompts:
-            if type == "user":
-                add({"role":"user", "content":content})
-            elif type == "system":
-                add({"role":"system", "content":content})
-            elif type == "assistant":
-                add({"role":"assistant", "content":content})
+        formatted = []
+        for role, content in prompts:
+            if role in ("user", "system", "assistant"):
+                formatted.append({"role": role, "content": content})
             else:
-                assert f"対応したメッセージ形式がありません。"
-        
-        return formated_prompts
+                raise ValueError(f"対応したメッセージ形式がありません: {role}")
+        return formatted
 
     def request_llm(self, prompts:list, disallowed_expressions=[], javascript_check=True):
         model_name, templature, url,  =  self.model_name, self.temperature, self.url
@@ -334,12 +325,10 @@ class Ollama_LLM:
             # parsed_result, error = message, None
 
             timestr = datetime.now().strftime(TIMESTR_FORMAT)
+            log_prompt = f""
+            for prompt in prompts:
+                log_prompt += f"{prompt['content']}"
             if error is None:
-                
-
-                log_prompt = f""
-                for prompt in prompts:
-                    log_prompt += f"{prompt.content}"
 
                 with (Path(log_dir) / f"coding_llm_{timestr}_human_prompt.txt").open("w", encoding='utf-8') as f:
                     f.write(log_prompt)
@@ -354,20 +343,21 @@ class Ollama_LLM:
                 print(f"\033[31m{code}\033[0m")
                 return code, timestr
             
-            with (Path(log_dir) / f"coding_llm_{timestr}_failed_code.txt").open("w", encoding='utf-8') as f:
-                f.write(parsed_result["failed_code"])
-            
-            logger.info(f"Failed coding. Message: {error}")
+            else:
+                with (Path(log_dir) / f"coding_llm_{timestr}_failed_human_prompt.txt").open("w", encoding='utf-8') as f:
+                    f.write(log_prompt)
+                with (Path(log_dir) / f"coding_llm_{timestr}_failed_code.txt").open("w", encoding='utf-8') as f:
+                    f.write(parsed_result["failed_code"])
+                logger.info(f"Failed coding. Message: {error}")
+                continue
+
         print(f"Failed coding in {max_trial} trials.")
         return "await doNothing(bot);", None
 
 if __name__ == "__main__":
-    from modules.config_loader import init_config, get_config
-    init_config("plugin/config.yaml")
-    CONFIG = get_config()
-    # llm = Opneai_LLM("logs", **CONFIG["openai"])
-    # llm = ollama_LLM("logs", **CONFIG["ollama"])
-    llm = Langchain_LLM("logs", **CONFIG["langchain"])
+    # llm = OpenaiLLM("logs", api_key=f"sk-xxx")
+    # llm = ollamaLLM("logs", api_key=f"sk-xxx")
+    llm = LangchainLLM("logs")
 
     prompt = llm.format_prompts_for_llm([("system", "こんにちは"), ("user", "こんにちは")])
 
