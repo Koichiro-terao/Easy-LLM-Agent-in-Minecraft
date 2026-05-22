@@ -8,6 +8,12 @@
 Easy LLM is a platform for developing AI agents that can play together with you in Minecraft.
 AI agents that use Easy LLM refer to in-game information and use an LLM to perform actions and chat with players.
 
+## Latest Updates
+
+### 2026-05-22
+- Removed restrictions on the functions available to the agent.
+- Reduced the likelihood of the agent failing to operate.
+
 ## What You Can Do with This Repository
 
 Implement an AI agent that can chat and play with you in Minecraft.
