@@ -10,6 +10,11 @@ AI agents that use Easy LLM refer to in-game information and use an LLM to perfo
 
 ## Latest Updates
 
+### 2026-05-31
+- Fixed the physics processing of AI agents and resolved an issue where agents were kicked from the server when taking damage.
+- Updated the prompt format to stabilize action generation by the LLM.
+- Added support for selecting world data when starting the Minecraft server.
+
 ### 2026-05-22
 - Removed restrictions on the functions available to the agent.
 - Reduced the likelihood of the agent failing to operate.
