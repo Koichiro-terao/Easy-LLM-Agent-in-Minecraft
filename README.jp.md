@@ -210,7 +210,7 @@ Default として、Minecraft サーバ起動時に `ws://host.docker.internal:7
 日本語での会話を行いたい場合は、以下の変更を行ってください。
 
 - L7 `generate_action: ./prompts/coding_llm_human_prompt_template.txt` を `generate_action: ./prompts/coding_llm_human_prompt_template_jp.txt`に変更
-- L9 `primitive: ./prompts/jp/coding_llm_system_prompt_template.txt` を `primitive: ./prompts/jp/coding_llm_system_prompt_template_jp.txt`に変更
+- L9 `primitive: ./prompts/coding_llm_system_prompt_template.txt` を `primitive: ./prompts/coding_llm_system_prompt_template_jp.txt`に変更
 
 ## 5. サンプルコードの実行
 

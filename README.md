@@ -204,7 +204,7 @@ item at src/sally_cfg.yml L11 match the [destination address configured in 4.1 S
 If you want to have conversations in Japanese, make the following changes.
 
 - Change L7 `generate_action: ./prompts/coding_llm_human_prompt_template.txt` to `generate_action: ./prompts/coding_llm_human_prompt_template_jp.txt`
-- Change L9 `primitive: ./prompts/jp/coding_llm_system_prompt_template.txt` to `primitive: ./prompts/jp/coding_llm_system_prompt_template_jp.txt`
+- Change L9 `primitive: ./prompts/coding_llm_system_prompt_template.txt` to `primitive: ./prompts/coding_llm_system_prompt_template_jp.txt`
 
 ## 5. Running the Sample Code
 
