@@ -1,9 +1,6 @@
-import re
-import time
 import json
 from datetime import datetime
 from pathlib import Path
-from javascript import require
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
 from openai import OpenAI
@@ -19,74 +16,6 @@ except ImportError:
 
 TIMESTR_FORMAT = '%Y%m%d_%H%M%S_%f'
 
-def _process_ai_message(message, disallowed_expressions=[]):
-    assert isinstance(message, str)
-
-    retry = 3
-    error = None
-    code = None
-    while retry > 0:
-        try:
-            babel = require("@babel/core")
-            babel_generator = require("@babel/generator").default
-
-            code_pattern = re.compile(r"```(?:javascript|js)(.*?)```", re.DOTALL)
-            code = "\n".join(code_pattern.findall(message))
-
-            # check whether disallowed expressions are included
-            for dic in disallowed_expressions:
-                assert dic["expression"] not in code, dic["message"]
-
-            #for line in code.split("\n"):
-            #    if "/tell" in line and "/tell @s" not in line:
-            #        raise Exception('Do not whisper to others using `bot.chat("/tell otherPlayerName ...")`. You can only whisper to yourself.')
-
-            parsed = babel.parse(code)
-            functions = []
-            assert len(list(parsed.program.body)) > 0, "No functions found"
-            for i, node in enumerate(parsed.program.body):
-                if node.type != "FunctionDeclaration":
-                    continue
-                node_type = (
-                    "AsyncFunctionDeclaration"
-                    if node["async"]
-                    else "FunctionDeclaration"
-                )
-                functions.append(
-                    {
-                        "name": node.id.name,
-                        "type": node_type,
-                        "body": babel_generator(node).code,
-                        "params": list(node["params"]),
-                    }
-                )
-            # find the last async function
-            main_function = None
-            for function in reversed(functions):
-                if function["type"] == "AsyncFunctionDeclaration":
-                    assert main_function is None, "Do not define multiple async functions. Only the main function can be defined as an async function. Also, just use the provided useful programs instead of redefining them."
-                    main_function = function
-            assert (
-                main_function is not None
-            ), "No async function found. Your main function must be async."
-            assert (
-                len(main_function["params"]) == 1
-                and main_function["params"][0].name == "bot"
-            ), f"Main function {main_function['name']} must take a single argument named 'bot'"
-            program_code = "\n\n".join(function["body"] for function in functions)
-            exec_code = f"await {main_function['name']}(bot);"
-            return {
-                "program_code": program_code,
-                "program_name": main_function["name"],
-                "exec_code": exec_code,
-                "whole_code": program_code + "\n" + exec_code
-            }, None
-        except Exception as e:
-            retry -= 1
-            error = e
-            time.sleep(1)
-
-    return {"failed_code": code}, f"Error parsing action response (before program execution): {error}"
 def _process_ai_message_json(message, disallowed_expressions=[]):
     parsed = json.loads(message)
     lines = parsed["code"]
@@ -235,7 +164,7 @@ class LangchainLLM:
             logger.info(f"finish llm chat create")
 
             if javascript_check:
-                parsed_result, error = _process_ai_message(message.content, disallowed_expressions=disallowed_expressions)
+                parsed_result, error = _process_ai_message_json(message.content, disallowed_expressions=disallowed_expressions)
             else:
                 parsed_result, error = {"whole_code":message.content}, None
             # parsed_result, error = message.content, None # デバッグ用
@@ -334,7 +263,7 @@ class OllamaLLM:
             print(f"{message}")
 
             if javascript_check:
-                parsed_result, error = _process_ai_message(message, disallowed_expressions=disallowed_expressions)
+                parsed_result, error = _process_ai_message_json(message, disallowed_expressions=disallowed_expressions)
             else:
                 parsed_result, error = {"whole_code":message}, None
             # parsed_result, error = message, None
